@@ -3,7 +3,7 @@ import { CiLogout } from "react-icons/ci";
 import useLogout from "../../../hooks/useLogout";
 import { useNavigate } from 'react-router-dom';
 import Modal from '../../DashboardComponents/Modal/Modal';
-import { SiAzuredataexplorer } from "react-icons/si";
+import { CommandLineIcon } from "@heroicons/react/24/solid";
 import { Tooltip, Typography } from '@material-tailwind/react';
 
 const Navbar = () => {
@@ -16,7 +16,7 @@ const Navbar = () => {
 
   return (
     <div className='text-text w-full px-5 sm:px-12 sm:py-10 py-3 flex items-end justify-between bg-transparent'>
-      <h1 className='ml-5 text-white text-xl sm:text-3xl font-bold'>CYBERTRON</h1>
+      <h1 className='ml-5 text-white text-xl sm:text-3xl font-bold'>Remote Agent Framework</h1>
       
       <div className='flex w-[230px] justify-between items-end'>
      
@@ -39,7 +39,7 @@ const Navbar = () => {
             <button 
             onClick={() => setIsOpen(true)} 
             className='flex items-center gap-1 text-secondary text-base sm:text-lg bg-transparent font-semibold rounded-[50px]'>
-              <SiAzuredataexplorer className='w-[1.3em] h-[1.3em] sm:w-[1.7em] sm:h-[1.7em] bg-light-pink rounded text-black py-[3px] sm:py-[6px] p-1 hover:border-accent hover:text-accent hover:bg-background2 transition-all' />
+              <CommandLineIcon className='w-[1.3em] h-[1.3em] sm:w-[1.7em] sm:h-[1.7em] bg-light-pink rounded text-black py-[3px] sm:py-[6px] p-1 hover:border-accent hover:text-accent hover:bg-background2 transition-all' />
             </button>
           </Tooltip>
 

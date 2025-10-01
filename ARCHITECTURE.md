@@ -38,25 +38,25 @@ RemoteAgentFramework is an educational cybersecurity simulation platform designe
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                     EDUCATIONAL VM ISOLATION                    │
-│                    (Required Safety Boundary)                   │
+│                    EDUCATIONAL VM ISOLATION                     │
+│                   (Required Safety Boundary)                    │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
 │  ┌─────────────────┐    ┌─────────────────┐    ┌─────────────┐  │
-│  │   React UI      │    │  Spring Boot    │    │ PostgreSQL  │  │
-│  │   Dashboard     │◄──►│   Controller    │◄──►│  Database   │  │
+│  │    React UI     │    │   Spring Boot   │    │ PostgreSQL  │  │
+│  │    Dashboard    │◄──►│   Controller    │◄──►│  Database   │  │
 │  │   (Port 3000)   │    │   (Port 8080)   │    │ (Port 5432) │  │
 │  └─────────────────┘    └─────────────────┘    └─────────────┘  │
 │           │                       │                             │
 │           │              ┌────────▼────────┐                    │
-│           │              │   WebSocket     │                    │
+│           │              │    WebSocket    │                    │
 │           │              │   Communication │                    │
 │           │              │   (Localhost)   │                    │
 │           │              └────────┬────────┘                    │
 │           │                       │                             │
 │  ┌────────▼───────────────────────▼────────┐                    │
-│  │        Educational Agent Clients        │                    │
-│  │         (Python Simulation)             │                    │
+│  │         Educational Agent Clients       │                    │
+│  │            (Python Simulation)          │                    │
 │  │      ┌─────────────────────────────┐    │                    │
 │  │      │   Safe Attack Simulations   │    │                    │
 │  │      │   • Fake Cookie Generation  │    │                    │

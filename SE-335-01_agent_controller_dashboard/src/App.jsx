@@ -11,6 +11,7 @@ import RequireAuth from "./components/AuthComponents/RequireAuth/RequireAuth";
 import Dashboard from './views/Dashboard';
 import Agents from './views/Agents';
 import AgentDetails from './views/AgentDetails';
+import DashboardExample from './views/DashboardExample';
 
 function App() {
 

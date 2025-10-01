@@ -171,7 +171,7 @@ const Dashboard = () => {
                             </h1>
                             {/* connected and disconnected agent information */}
 
-                            <div className='grid-cols-2'>
+                            <div className='grid grid-cols-2 gap-4'>
 
                                 {/* map through data */}
                                 { matchedAgents.map((pair, index) => {
