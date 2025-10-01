@@ -1,0 +1,120 @@
+name: Educational Safety Verification
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+env:
+  EDUCATIONAL_FRAMEWORK: RemoteAgentFramework
+
+jobs:
+  educational-safety-check:
+    name: Educational Safety Verification
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+      
+    - name: Educational Framework Validation
+      run: |
+        echo "🎓 Verifying Educational Safety Measures"
+        echo "========================================"
+        
+        # Check for educational disclaimers
+        if ! grep -q "EDUCATIONAL USE ONLY" README.md; then
+          echo "❌ Missing educational disclaimers in README"
+          exit 1
+        fi
+        
+        # Check for VM isolation requirements
+        if ! grep -q "VM.*isolation" README.md DEPLOYMENT.md; then
+          echo "❌ Missing VM isolation requirements"
+          exit 1
+        fi
+        
+        # Check for instructor supervision requirements
+        if ! grep -q "instructor.*supervision" INSTRUCTOR_GUIDE.md; then
+          echo "❌ Missing instructor supervision requirements"
+          exit 1
+        fi
+        
+        # Check for dangerous dependencies removal
+        if grep -q "browser-cookie3" SE-335-01_agent_client/pyproject.toml; then
+          echo "❌ Dangerous browser-cookie3 dependency still present"
+          exit 1
+        fi
+        
+        # Check for educational license
+        if ! grep -q "Educational Use Only" LICENSE; then
+          echo "❌ Missing educational use restrictions in LICENSE"
+          exit 1
+        fi
+        
+        echo "✅ All educational safety measures verified!"
+        
+    - name: Security Configuration Check
+      run: |
+        echo "🔒 Verifying Security Configurations"
+        echo "==================================="
+        
+        # Check localhost-only configurations
+        if ! grep -q "127.0.0.1" docker-compose.yml; then
+          echo "❌ Missing localhost-only network binding"
+          exit 1
+        fi
+        
+        # Check for educational labels
+        if ! grep -q "com.educational" docker-compose.yml; then
+          echo "❌ Missing educational labels in Docker configuration"
+          exit 1
+        fi
+        
+        echo "✅ Security configurations verified!"
+        
+    - name: Documentation Completeness Check
+      run: |
+        echo "📚 Verifying Documentation Completeness"
+        echo "======================================="
+        
+        required_docs=(
+          "README.md"
+          "ARCHITECTURE.md"
+          "DEPLOYMENT.md"
+          "INSTRUCTOR_GUIDE.md"
+          "LICENSE"
+        )
+        
+        for doc in "${required_docs[@]}"; do
+          if [ ! -f "$doc" ]; then
+            echo "❌ Missing required documentation: $doc"
+            exit 1
+          fi
+          
+          if [ $(wc -l < "$doc") -lt 50 ]; then
+            echo "❌ Documentation too brief: $doc"
+            exit 1
+          fi
+        done
+        
+        echo "✅ All required documentation present and comprehensive!"
+        
+    - name: Educational Safety Summary
+      run: |
+        echo "🎓 Educational Safety Verification Complete"
+        echo "=========================================="
+        echo "✅ Educational disclaimers verified"
+        echo "✅ VM isolation requirements documented"
+        echo "✅ Instructor supervision requirements specified"
+        echo "✅ Dangerous dependencies removed"
+        echo "✅ Security configurations validated"
+        echo "✅ Documentation completeness confirmed"
+        echo ""
+        echo "🔒 Framework ready for educational deployment with:"
+        echo "  • VM isolation (mandatory)"
+        echo "  • Qualified instructor supervision"
+        echo "  • Educational institution oversight"
+        echo "  • Student safety training"

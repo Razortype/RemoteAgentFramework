@@ -1,0 +1,37 @@
+[tool.poetry]
+name = "remote-agent-framework-client"
+version = "1.0.0"
+description = "Educational cybersecurity simulation client for RemoteAgentFramework"
+authors = ["Educational Cybersecurity Team"]
+license = "SEE LICENSE IN LICENSE"
+readme = "README.md"
+packages = [{include = "src"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+requests = "^2.32.3"
+platformdirs = "^4.3.6"
+pyjwt = "^2.9.0"
+websocket-client = "^1.8.0"
+cryptography = "^43.0.1"
+keyring = "^25.4.1"
+pytz = "^2024.2"
+faker = "^30.3.0"
+pytest = "^8.3.3"
+pydantic = "^2.9.2"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.3"
+pytest-cov = "^5.0.0"
+black = "^24.8.0"
+flake8 = "^7.1.1"
+mypy = "^1.11.2"
+
+[tool.poetry.group.test.dependencies]
+pytest = "^8.3.3"
+pytest-mock = "^3.14.0"
+pytest-asyncio = "^0.24.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

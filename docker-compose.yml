@@ -1,0 +1,127 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  database:
+    image: postgres:16-alpine
+    container_name: raf-database
+    environment:
+      POSTGRES_DB: cyberproject_db
+      POSTGRES_USER: cyberproject_user
+      POSTGRES_PASSWORD: educational_password_change_in_production
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8"
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cyberproject_user -d cyberproject_db"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - raf-network
+    labels:
+      - "com.educational.framework=RemoteAgentFramework"
+      - "com.educational.warning=VM_ISOLATION_REQUIRED"
+
+  # Spring Boot Controller Service
+  controller-service:
+    build:
+      context: ./SE-335-01_agent-controller-service
+      dockerfile: Dockerfile
+    container_name: raf-controller
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_URL: jdbc:postgresql://database:5432/cyberproject_db
+      SPRING_DATASOURCE_USERNAME: cyberproject_user
+      SPRING_DATASOURCE_PASSWORD: educational_password_change_in_production
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SERVER_ADDRESS: 0.0.0.0
+      ALLOWED_ORIGINS: http://localhost:3000
+      AUTH_EXP_SEC: 43200000
+      REFRESH_EXP_SEC: 302400000
+    ports:
+      - "127.0.0.1:8080:8080"
+    depends_on:
+      database:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    restart: unless-stopped
+    networks:
+      - raf-network
+    labels:
+      - "com.educational.framework=RemoteAgentFramework"
+      - "com.educational.component=controller-service"
+
+  # React Dashboard
+  dashboard:
+    build:
+      context: ./SE-335-01_agent_controller_dashboard
+      dockerfile: Dockerfile
+    container_name: raf-dashboard
+    environment:
+      NODE_ENV: production
+      REACT_APP_API_URL: http://localhost:8080
+    ports:
+      - "127.0.0.1:3000:3000"
+    depends_on:
+      controller-service:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+    networks:
+      - raf-network
+    labels:
+      - "com.educational.framework=RemoteAgentFramework"
+      - "com.educational.component=dashboard"
+
+  # Python Agent Client (for testing/demo)
+  agent-client:
+    build:
+      context: ./SE-335-01_agent_client
+      dockerfile: Dockerfile
+    container_name: raf-agent-client
+    environment:
+      WEBSOCKET_HOST: controller-service
+      WEBSOCKET_PORT: 8080
+      LOG_LEVEL: INFO
+    depends_on:
+      controller-service:
+        condition: service_healthy
+    restart: "no"  # Manual start for educational demos
+    networks:
+      - raf-network
+    labels:
+      - "com.educational.framework=RemoteAgentFramework"
+      - "com.educational.component=agent-client"
+      - "com.educational.usage=demo-only"
+
+networks:
+  raf-network:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.20.0.0/16
+    labels:
+      - "com.educational.framework=RemoteAgentFramework"
+      - "com.educational.isolation=required"
+
+volumes:
+  postgres_data:
+    driver: local
+    labels:
+      - "com.educational.framework=RemoteAgentFramework"
+      - "com.educational.data=ephemeral"

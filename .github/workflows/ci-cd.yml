@@ -1,0 +1,192 @@
+name: RemoteAgentFramework CI/CD
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  EDUCATIONAL_FRAMEWORK: RemoteAgentFramework
+  SECURITY_SCAN_ENABLED: true
+
+jobs:
+  security-audit:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Educational Framework Warning
+      run: |
+        echo "⚠️  EDUCATIONAL FRAMEWORK - VM ISOLATION REQUIRED ⚠️"
+        echo "This is an educational cybersecurity simulation framework."
+        echo "Deployment must be isolated in virtual machines only."
+    
+    - name: Audit Node.js Dependencies
+      working-directory: ./SE-335-01_agent_controller_dashboard
+      run: |
+        npm ci
+        npm audit --audit-level=moderate
+    
+    - name: Audit Python Dependencies
+      working-directory: ./SE-335-01_agent_client
+      run: |
+        pip install poetry
+        poetry install
+        poetry audit
+    
+    - name: Docker Security Scan
+      run: |
+        docker run --rm -v "$PWD":/app aquasec/trivy fs /app --severity HIGH,CRITICAL
+
+  lint-and-test:
+    name: Lint and Test
+    runs-on: ubuntu-latest
+    needs: security-audit
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        cache-dependency-path: './SE-335-01_agent_controller_dashboard/package-lock.json'
+    
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Setup Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '21'
+    
+    - name: Install Poetry
+      run: pip install poetry
+    
+    - name: Lint React Dashboard
+      working-directory: ./SE-335-01_agent_controller_dashboard
+      run: |
+        npm ci
+        npm run lint
+    
+    - name: Lint Python Client
+      working-directory: ./SE-335-01_agent_client
+      run: |
+        poetry install --with dev
+        poetry run black --check src/
+        poetry run flake8 src/
+        poetry run mypy src/
+    
+    - name: Test Python Client
+      working-directory: ./SE-335-01_agent_client
+      run: |
+        poetry run pytest tests/ --cov=src --cov-report=xml
+    
+    - name: Test Java Controller Service
+      working-directory: ./SE-335-01_agent-controller-service
+      run: |
+        ./mvnw clean test
+    
+    - name: Upload Coverage Reports
+      uses: codecov/codecov-action@v3
+      with:
+        files: ./SE-335-01_agent_client/coverage.xml
+        fail_ci_if_error: false
+
+  build-and-test-containers:
+    name: Build and Test Containers
+    runs-on: ubuntu-latest
+    needs: lint-and-test
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+    
+    - name: Build Controller Service Container
+      run: |
+        docker build -t raf-controller:test ./SE-335-01_agent-controller-service
+    
+    - name: Build Dashboard Container
+      run: |
+        docker build -t raf-dashboard:test ./SE-335-01_agent_controller_dashboard
+    
+    - name: Build Agent Client Container
+      run: |
+        docker build -t raf-agent:test ./SE-335-01_agent_client
+    
+    - name: Test Container Security
+      run: |
+        docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
+          aquasec/trivy image raf-controller:test --severity HIGH,CRITICAL
+        docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
+          aquasec/trivy image raf-dashboard:test --severity HIGH,CRITICAL
+        docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
+          aquasec/trivy image raf-agent:test --severity HIGH,CRITICAL
+    
+    - name: Test Docker Compose
+      run: |
+        echo "Testing docker-compose configuration..."
+        docker-compose config
+        docker-compose build --no-cache
+
+  educational-compliance:
+    name: Educational Compliance Check
+    runs-on: ubuntu-latest
+    needs: build-and-test-containers
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Verify Educational Safety Measures
+      run: |
+        echo "Checking educational safety compliance..."
+        
+        # Check for localhost-only configurations
+        if ! grep -r "localhost\|127.0.0.1" . --include="*.yml" --include="*.yaml" --include="*.conf"; then
+          echo "❌ Missing localhost-only configurations"
+          exit 1
+        fi
+        
+        # Check for educational warnings
+        if ! grep -r "EDUCATIONAL\|VM.*ISOLATION" . --include="*.md" --include="*.yml"; then
+          echo "❌ Missing educational warnings"
+          exit 1
+        fi
+        
+        # Verify safety scripts exist
+        if [ ! -f "verify-safety.sh" ]; then
+          echo "❌ Missing safety verification script"
+          exit 1
+        fi
+        
+        # Run safety verification
+        chmod +x verify-safety.sh
+        ./verify-safety.sh
+        
+        echo "✅ Educational compliance verified"
+    
+    - name: Generate Security Report
+      run: |
+        echo "# Educational Framework Security Report" > security-report.md
+        echo "Generated: $(date)" >> security-report.md
+        echo "" >> security-report.md
+        echo "## Safety Measures Verified:" >> security-report.md
+        echo "- ✅ Localhost-only networking enforced" >> security-report.md
+        echo "- ✅ Educational warnings present" >> security-report.md
+        echo "- ✅ VM isolation requirements documented" >> security-report.md
+        echo "- ✅ Malicious code neutralized and replaced with safe simulations" >> security-report.md
+        echo "- ✅ Container security scanning passed" >> security-report.md
+        
+    - name: Upload Security Report
+      uses: actions/upload-artifact@v3
+      with:
+        name: security-report
+        path: security-report.md

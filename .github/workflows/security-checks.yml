@@ -1,0 +1,243 @@
+name: Security and Safety Checks
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  security-scan:
+    runs-on: ubuntu-latest
+    name: Security Scanning
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install poetry safety bandit semgrep
+        poetry install
+    
+    - name: Secret Scanning
+      run: |
+        echo "Scanning for hardcoded secrets..."
+        # Check for common secret patterns
+        grep -r -i -n \
+          -e "password.*=" \
+          -e "secret.*=" \
+          -e "token.*=" \
+          -e "key.*=" \
+          -e "api_key" \
+          -e "auth_token" \
+          --exclude-dir=.git \
+          --exclude="*.md" \
+          --exclude="*.yml" \
+          . || echo "No obvious secrets found"
+    
+    - name: Dependency Vulnerability Scan  
+      run: |
+        echo "Checking for vulnerable dependencies..."
+        pip install pip-audit
+        pip-audit --desc
+    
+    - name: Python Security Analysis with Bandit
+      run: |
+        echo "Running Bandit security analysis..."
+        bandit -r src/ -f json -o bandit-report.json || true
+        bandit -r src/ -f txt
+    
+    - name: Check for Dangerous Imports
+      run: |
+        echo "Scanning for potentially dangerous imports..."
+        python - << 'EOF'
+        import os
+        import re
+        
+        dangerous_patterns = [
+            r'import browser_cookie3',
+            r'from browser_cookie3',
+            r'import sqlite3.*connect',
+            r'cryptography.*cipher',
+            r'subprocess\.call',
+            r'os\.system',
+            r'eval\(',
+            r'exec\('
+        ]
+        
+        found_issues = False
+        for root, dirs, files in os.walk('src'):
+            for file in files:
+                if file.endswith('.py'):
+                    filepath = os.path.join(root, file)
+                    with open(filepath, 'r') as f:
+                        content = f.read()
+                        for pattern in dangerous_patterns:
+                            if re.search(pattern, content):
+                                print(f"⚠️  DANGER: Found {pattern} in {filepath}")
+                                found_issues = True
+        
+        if not found_issues:
+            print("✅ No dangerous imports detected")
+        else:
+            print("❌ Dangerous imports found - review required")
+            exit(1)
+        EOF
+    
+    - name: Verify Safety Markers
+      run: |
+        echo "Checking for required safety markers in simulation code..."
+        python - << 'EOF'
+        import os
+        import re
+        
+        required_markers = [
+            r'SAFE SIMULATION',
+            r'EDUCATIONAL',
+            r'WARNING.*simulation'
+        ]
+        
+        attack_files = []
+        for root, dirs, files in os.walk('src'):
+            for file in files:
+                if 'attack' in file.lower() and file.endswith('.py'):
+                    attack_files.append(os.path.join(root, file))
+        
+        missing_markers = []
+        for filepath in attack_files:
+            with open(filepath, 'r') as f:
+                content = f.read()
+                has_markers = any(re.search(pattern, content, re.IGNORECASE) 
+                                for pattern in required_markers)
+                if not has_markers:
+                    missing_markers.append(filepath)
+        
+        if missing_markers:
+            print("❌ Attack files missing safety markers:")
+            for file in missing_markers:
+                print(f"   {file}")
+            exit(1)
+        else:
+            print("✅ All attack files have safety markers")
+        EOF
+    
+    - name: Upload Security Reports
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: security-reports
+        path: |
+          bandit-report.json
+
+  safety-tests:
+    runs-on: ubuntu-latest
+    name: Safety Tests
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install poetry pytest
+        poetry install
+    
+    - name: Run Safety Tests
+      run: |
+        echo "Running safety verification tests..."
+        python -m pytest tests/test_safe_attacks.py -v --tb=short
+    
+    - name: Verify No Network Access
+      run: |
+        echo "Testing network isolation..."
+        python - << 'EOF'
+        import subprocess
+        import sys
+        
+        # Test that simulation doesn't make real network calls
+        try:
+            result = subprocess.run([
+                'python', '-c', 
+                'from src.service.websocket_service import WebSocketClientSevice; '
+                'import unittest.mock; '
+                'app = unittest.mock.Mock(); '
+                'ws = WebSocketClientSevice(app, "ws://external.com", "/test"); '
+                'print(ws.url)'
+            ], capture_output=True, text=True, timeout=10)
+            
+            if 'localhost' in result.stdout:
+                print("✅ External URLs properly redirected to localhost")
+            else:
+                print("❌ External URL not blocked")
+                sys.exit(1)
+        except Exception as e:
+            print(f"❌ Network test failed: {e}")
+            sys.exit(1)
+        EOF
+    
+    - name: Check Test File Creation
+      run: |
+        echo "Verifying safe test file creation..."
+        python -c "
+        import tempfile
+        import os
+        import sys
+        sys.path.append('src')
+        
+        # Verify test directories are created safely
+        from module.attacker_module.attacks.custom_attack import FileFolderDiscoveryAttack
+        from unittest.mock import Mock
+        
+        attack = FileFolderDiscoveryAttack(Mock(), Mock())
+        dirs = attack._create_safe_test_directories()
+        
+        for d in dirs:
+            if not d.startswith('./lab_test_files/'):
+                print(f'❌ Unsafe directory: {d}')
+                sys.exit(1)
+                
+        print('✅ All test directories are safe')
+        "
+
+  lint-and-format:
+    runs-on: ubuntu-latest
+    name: Code Quality
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+    
+    - name: Install linting tools
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8 black isort mypy
+    
+    - name: Lint with flake8
+      run: |
+        # Check syntax errors and undefined names
+        flake8 src/ --count --select=E9,F63,F7,F82 --show-source --statistics
+        # Check code style (allow some flexibility for educational code)
+        flake8 src/ --count --max-complexity=10 --max-line-length=100 --statistics
+    
+    - name: Check import sorting
+      run: |
+        isort --check-only --diff src/
+    
+    - name: Check code formatting
+      run: |
+        black --check --diff src/

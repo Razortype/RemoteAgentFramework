@@ -1,0 +1,450 @@
+openapi: 3.0.3
+info:
+  title: RemoteAgentFramework Controller Service API
+  description: |
+    Educational cybersecurity simulation framework API.
+    
+    ⚠️ **FOR EDUCATIONAL USE ONLY - VM ISOLATION REQUIRED** ⚠️
+    
+    This API is part of an educational cybersecurity framework designed for 
+    controlled learning environments. It must only be deployed in isolated 
+    virtual machines with localhost-only access.
+    
+    ## Educational Safety Features:
+    - Localhost-only networking enforced
+    - Safe simulation data only
+    - No real sensitive data access
+    - VM isolation requirements
+    - Educational usage tracking
+    
+    ## Security Notice:
+    This framework simulates cybersecurity attack patterns for educational 
+    purposes only. All potentially dangerous functionality has been neutralized 
+    and replaced with safe educational simulations.
+  version: "1.0.0"
+  contact:
+    name: Educational Cybersecurity Team
+    email: education@cybersecurity.example
+  license:
+    name: Educational Use License
+    url: "./LICENSE"
+
+servers:
+  - url: http://localhost:8080
+    description: Educational development server (localhost only)
+
+security:
+  - bearerAuth: []
+
+paths:
+  /auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: User authentication (educational accounts only)
+      description: Authenticate users for educational simulation access
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+            example:
+              email: "student@university.edu"
+              password: "educational_password"
+      responses:
+        '200':
+          description: Authentication successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          description: Authentication failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/register:
+    post:
+      tags:
+        - Authentication
+      summary: Register educational user account
+      description: Register new user for educational simulation access
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '400':
+          description: Registration failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /agents:
+    get:
+      tags:
+        - Agent Management
+      summary: List connected educational agents
+      description: Get list of agents connected to the educational simulation
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of connected agents
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AgentInfo'
+
+  /attacks/jobs:
+    get:
+      tags:
+        - Educational Attacks
+      summary: List educational attack simulations
+      description: Get list of educational attack simulation jobs
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [active, completed, pending]
+          description: Filter by attack job status
+      responses:
+        '200':
+          description: List of attack simulation jobs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AttackJob'
+
+    post:
+      tags:
+        - Educational Attacks
+      summary: Create educational attack simulation
+      description: Create new educational attack simulation job (safe simulation only)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAttackJobRequest'
+      responses:
+        '201':
+          description: Attack simulation job created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttackJob'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /attacks/jobs/{jobId}:
+    get:
+      tags:
+        - Educational Attacks
+      summary: Get educational attack simulation details
+      description: Get details of specific educational attack simulation
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: jobId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Attack job ID
+      responses:
+        '200':
+          description: Attack simulation job details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttackJob'
+        '404':
+          description: Attack job not found
+
+  /logs:
+    get:
+      tags:
+        - Educational Logging
+      summary: Get educational simulation logs
+      description: Retrieve logs from educational attack simulations
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: jobId
+          in: query
+          schema:
+            type: integer
+          description: Filter logs by attack job ID
+        - name: level
+          in: query
+          schema:
+            type: string
+            enum: [INFO, WARN, ERROR, DEBUG]
+          description: Filter logs by level
+      responses:
+        '200':
+          description: Educational simulation logs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LogEntry'
+
+  /educational/safety:
+    get:
+      tags:
+        - Educational Safety
+      summary: Verify educational safety measures
+      description: Endpoint to verify that educational safety measures are active
+      responses:
+        '200':
+          description: Educational safety verification
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SafetyVerification'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          example: "student@university.edu"
+        password:
+          type: string
+          example: "educational_password"
+
+    RegisterRequest:
+      type: object
+      required:
+        - firstname
+        - lastname
+        - email
+        - password
+        - role
+      properties:
+        firstname:
+          type: string
+          example: "John"
+        lastname:
+          type: string
+          example: "Student"
+        email:
+          type: string
+          format: email
+          example: "student@university.edu"
+        password:
+          type: string
+          example: "educational_password"
+        role:
+          type: string
+          enum: [STUDENT, INSTRUCTOR, ADMIN]
+          example: "STUDENT"
+
+    AuthResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          description: JWT access token
+        refreshToken:
+          type: string
+          description: JWT refresh token
+        user:
+          $ref: '#/components/schemas/UserResponse'
+
+    UserResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        firstname:
+          type: string
+        lastname:
+          type: string
+        email:
+          type: string
+        role:
+          type: string
+          enum: [STUDENT, INSTRUCTOR, ADMIN]
+        createdAt:
+          type: string
+          format: date-time
+
+    AgentInfo:
+      type: object
+      properties:
+        sessionId:
+          type: string
+        userEmail:
+          type: string
+        status:
+          type: string
+          enum: [CONNECTED, BUSY, IDLE, DISCONNECTED]
+        lastSeen:
+          type: string
+          format: date-time
+        address:
+          type: string
+          description: "Always localhost for educational safety"
+
+    AttackJob:
+      type: object
+      properties:
+        id:
+          type: integer
+        attackName:
+          type: string
+          example: "Educational Cookie Simulation"
+        attackDescription:
+          type: string
+          example: "Safe simulation of cookie extraction for educational purposes"
+        attackType:
+          type: string
+          enum: [COOKIE_SIMULATION, FILE_SCAN_SIMULATION, NETWORK_SIMULATION]
+        active:
+          type: boolean
+        started:
+          type: boolean
+        crashed:
+          type: boolean
+        executeAt:
+          type: string
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+        startExecutingAt:
+          type: string
+          format: date-time
+        agent:
+          $ref: '#/components/schemas/UserResponse'
+
+    CreateAttackJobRequest:
+      type: object
+      required:
+        - attackName
+        - attackDescription
+        - attackType
+        - executeAt
+      properties:
+        attackName:
+          type: string
+          example: "Educational Cookie Simulation"
+        attackDescription:
+          type: string
+          example: "Safe simulation demonstrating cookie extraction concepts"
+        attackType:
+          type: string
+          enum: [COOKIE_SIMULATION, FILE_SCAN_SIMULATION, NETWORK_SIMULATION]
+        executeAt:
+          type: string
+          format: date-time
+
+    LogEntry:
+      type: object
+      properties:
+        id:
+          type: integer
+        logText:
+          type: string
+        logType:
+          type: string
+        logLevel:
+          type: string
+          enum: [INFO, WARN, ERROR, DEBUG]
+        createdAt:
+          type: string
+          format: date-time
+
+    SafetyVerification:
+      type: object
+      properties:
+        frameworkName:
+          type: string
+          example: "RemoteAgentFramework"
+        version:
+          type: string
+          example: "1.0.0"
+        educationalMode:
+          type: boolean
+          example: true
+        vmIsolationRequired:
+          type: boolean
+          example: true
+        localhostOnly:
+          type: boolean
+          example: true
+        maliciousCodeNeutralized:
+          type: boolean
+          example: true
+        safeSimulationOnly:
+          type: boolean
+          example: true
+        verificationTimestamp:
+          type: string
+          format: date-time
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        path:
+          type: string
+
+tags:
+  - name: Authentication
+    description: Educational user authentication
+  - name: Agent Management
+    description: Educational agent simulation management
+  - name: Educational Attacks
+    description: Safe educational attack simulations
+  - name: Educational Logging
+    description: Educational simulation logging
+  - name: Educational Safety
+    description: Educational safety verification

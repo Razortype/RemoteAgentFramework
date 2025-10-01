@@ -1,0 +1,90 @@
+MIT Educational Use License
+
+Copyright (c) 2025 RemoteAgentFramework Educational Project
+
+Educational Use Only - No Commercial or Malicious Use Permitted
+
+Permission is hereby granted, free of charge, to any person or institution 
+obtaining a copy of this software and associated documentation files (the 
+"Software"), to use the Software solely for educational and research purposes, 
+subject to the following conditions:
+
+MANDATORY EDUCATIONAL USE CONDITIONS:
+
+1. Educational Use Only: This software may ONLY be used for:
+   - Academic cybersecurity education and research
+   - Authorized educational institutions
+   - Supervised cybersecurity training programs
+   - Academic research with proper institutional oversight
+
+2. VM Isolation Required: This software MUST ONLY be deployed in:
+   - Isolated virtual machines with no production network access
+   - Educational laboratory environments
+   - Sandboxed testing environments with proper controls
+   - Academic research environments with appropriate safeguards
+
+3. Instructor Supervision: Use of this software requires:
+   - Qualified cybersecurity instructor supervision
+   - Institutional approval and oversight
+   - Completed student safety training
+   - Documented educational objectives
+
+4. Safety Measures: All users must:
+   - Verify educational safety measures are in place
+   - Use only localhost (127.0.0.1) network bindings
+   - Maintain VM isolation throughout usage
+   - Report any security concerns to educational authorities
+
+PROHIBITED USES:
+
+- Commercial use or distribution
+- Production deployment of any kind
+- Malicious use or actual cyber attacks
+- Use without proper educational oversight
+- Use outside of isolated virtual machines
+- Modification for malicious purposes
+- Distribution to unauthorized parties
+
+DISCLAIMER AND LIABILITY:
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. 
+
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+EDUCATIONAL INSTITUTION LIABILITY:
+
+Educational institutions using this software are responsible for:
+- Ensuring proper VM isolation and security measures
+- Providing qualified instructor supervision
+- Maintaining compliance with all applicable laws
+- Implementing appropriate safety protocols
+- Training students on ethical use and legal compliance
+
+COMPLIANCE REQUIREMENTS:
+
+All users must comply with:
+- Local, state, and federal laws regarding cybersecurity
+- Educational institution policies and procedures
+- Professional ethical guidelines for cybersecurity
+- Responsible disclosure practices for any discovered vulnerabilities
+
+MODIFICATION AND DISTRIBUTION:
+
+- Modifications must maintain all educational safety measures
+- Distribution requires maintaining this license and all safety warnings
+- Commercial distribution is strictly prohibited
+- All derivatives must include educational use restrictions
+
+By using this software, you acknowledge that you have read, understood, and 
+agree to be bound by these terms and conditions.
+
+For questions about educational use, contact your institutional cybersecurity
+program administrator or the project maintainers.
+
+REMEMBER: This software is for educational purposes only and requires proper
+institutional oversight and VM isolation for safe operation.

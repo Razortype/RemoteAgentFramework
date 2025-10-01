@@ -1,0 +1,64 @@
+EDUCATIONAL USE ONLY LICENSE
+
+Copyright (c) 2024 Cybersecurity Education Lab Contributors
+
+IMPORTANT: This software is intended exclusively for educational and research 
+purposes in cybersecurity. Use is subject to strict restrictions.
+
+PERMITTED USES:
+- Educational instruction in cybersecurity concepts
+- Academic research in controlled environments
+- Security awareness training and demonstrations
+- Development of defensive security measures
+- Learning ethical hacking and penetration testing concepts
+
+PROHIBITED USES:
+- Any malicious or unauthorized activities
+- Accessing systems, networks, or data without explicit permission
+- Commercial exploitation or distribution
+- Use on production systems or networks
+- Any activity that violates applicable laws or regulations
+- Circumventing security measures on systems you do not own
+- Data theft, surveillance, or privacy violations
+
+SAFETY REQUIREMENTS:
+- Use ONLY in isolated virtual machines with no internet access
+- Use ONLY with synthetic/test data - never real user data
+- Use ONLY on systems you own and control
+- Maintain complete network isolation during testing
+- Follow all applicable laws and ethical guidelines
+
+DISCLAIMER:
+THIS SOFTWARE IS PROVIDED "AS IS" FOR EDUCATIONAL PURPOSES ONLY.
+THE AUTHORS PROVIDE NO WARRANTIES AND ASSUME NO LIABILITY FOR ANY MISUSE.
+USERS ARE SOLELY RESPONSIBLE FOR COMPLIANCE WITH ALL APPLICABLE LAWS.
+
+REDISTRIBUTION CONDITIONS:
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that:
+
+1. Redistributions of source code must retain this license notice
+2. Redistributions in binary form must reproduce this license notice
+3. Neither the name of the copyright holders nor contributors may be used
+   to endorse or promote products derived from this software
+4. Any modifications must maintain all safety restrictions and educational purpose
+5. Redistribution must include all safety warnings and usage restrictions
+
+TERMINATION:
+This license automatically terminates if you violate any terms. Upon termination,
+you must immediately cease all use and destroy all copies.
+
+GOVERNING LAW:
+This license is governed by the laws of [Your Jurisdiction]. Any disputes shall
+be resolved in the courts of [Your Jurisdiction].
+
+NO COMMERCIAL LICENSE:
+Commercial use requires separate written permission from the copyright holders.
+
+EDUCATIONAL INSTITUTION CLAUSE:
+Academic institutions may use this software for educational purposes only,
+subject to all restrictions herein, and must ensure student compliance with
+all terms.
+
+By using this software, you acknowledge that you have read, understood, and
+agree to be bound by these terms and all applicable laws.
